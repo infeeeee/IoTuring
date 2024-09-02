@@ -25,7 +25,7 @@ RADIOPOWER =['dBm']
 SPACE_BEFORE_UNIT = ' '
 
 class ValueFormatter():
-    
+
     # includeUnit: isn't in the option as it's chosen by each warehouse and not by the entity itself
     @staticmethod
     def FormatValue(value, options: ValueFormatterOptions | None, includeUnit: bool):
@@ -34,13 +34,13 @@ class ValueFormatter():
         IncludeUnit: True if the unit has to be included in the value
         """
         return str(ValueFormatter._ParseValue(value, options, includeUnit))
-    
+
     @staticmethod
     def _ParseValue(value, options: ValueFormatterOptions | None, includeUnit: bool):
         if options is None:
             return value
         valueType = options.get_value_type()
-        
+
         # specific type formatting
         if valueType == ValueFormatterOptions.TYPE_NONE:  # edit needed only if decimals
             return ValueFormatter.roundValue(value, options)
@@ -67,8 +67,17 @@ class ValueFormatter():
             return ValueFormatter.BitPerSecondFormatter(value, options, includeUnit)
         elif valueType == ValueFormatterOptions.TYPE_BYTE_PER_SECOND:
             return ValueFormatter.BytePerSecondFormatter(value, options, includeUnit)
+        elif valueType == ValueFormatterOptions.TYPE_BINARY:
+            return ValueFormatter.BinaryFormatter(value)
         else:
             return str(value)
+
+    @staticmethod
+    def BinaryFormatter(value):
+        if int(value) > 0:
+            return 1
+        else:
+            return 0
 
     @staticmethod
     def TimeFormatter(value, options: ValueFormatterOptions, includeUnit: bool):
@@ -96,9 +105,9 @@ class ValueFormatter():
     @staticmethod
     def MillisecondsFormatter(value, options: ValueFormatterOptions, includeUnit: bool):
         # Get value in milliseconds: adjust not implemented
-        
+
         value = ValueFormatter.roundValue(value, options)
-        
+
         if includeUnit:
             return str(value) + SPACE_BEFORE_UNIT + 'ms'
         else:
@@ -145,7 +154,7 @@ class ValueFormatter():
         value = ValueFormatter.roundValue(value, options)
 
         result = str(value)
-        
+
         if includeUnit:
             result = result + SPACE_BEFORE_UNIT + FREQUENCY_SIZES[index]
         return result
@@ -154,39 +163,39 @@ class ValueFormatter():
     @staticmethod
     def TemperatureCelsiusFormatter(value, options: ValueFormatterOptions, includeUnit: bool):
         # asked_size not implemented
-        
+
         # decimals
         value = ValueFormatter.roundValue(value, options)
 
         result = str(value)
-        
+
         if includeUnit:
-            result = result + SPACE_BEFORE_UNIT + CELSIUS_UNIT 
+            result = result + SPACE_BEFORE_UNIT + CELSIUS_UNIT
         return result
 
     @staticmethod
     def RoundsPerMinuteFormatter(value, options: ValueFormatterOptions, includeUnit: bool):
         # asked_size not implemented
-        
+
         # decimals
         value = ValueFormatter.roundValue(value, options)
 
         result = str(value)
-        
+
         if includeUnit:
             result = result + SPACE_BEFORE_UNIT + ROTATION[0]
         return result
 
     @staticmethod
     def RadioPowerFormatter(value, options: ValueFormatterOptions, includeUnit: bool):
-        
+
         value = ValueFormatter.roundValue(value, options)
-        
+
         if includeUnit:
             return str(value) + SPACE_BEFORE_UNIT + 'dBm'
         else:
             return str(value)
-        
+
     @staticmethod
     def BytePerSecondFormatter(value, options: ValueFormatterOptions, includeUnit: bool):
         # Get value in hertz, and adjustable
@@ -227,4 +236,3 @@ class ValueFormatter():
         if options.get_decimals() != ValueFormatterOptions.DO_NOT_TOUCH_DECIMALS:
             return round(value, options.get_decimals())
         return value
-    
